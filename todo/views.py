@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
-from todo.models import Task
+from todo.models import Task, Comment  # Comment を追加
+from todo.forms import CommentForm     # CommentForm を追加
 
 
 def index(request):
@@ -30,8 +31,22 @@ def detail(request, task_id):
     except Task.DoesNotExist:
         raise Http404("Task does not exist")
 
+    comments = task.comments.all().order_by('-created')  # コメント取得
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.task = task
+            comment.save()
+            return redirect('detail', task_id=task.id)
+    else:
+        form = CommentForm()
+
     context = {
         'task': task,
+        'comments': comments,
+        'form': form,
     }
     return render(request, 'todo/detail.html', context)
 
