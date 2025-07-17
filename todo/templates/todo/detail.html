@@ -28,6 +28,23 @@
       <a href="{% url 'update' task.id %}">Edit</a>
       <a href="{% url 'close' task.id %}">Close</a>
     </div>
+
+    <hr>
+
+    <h2>コメント一覧</h2>
+    {% for comment in comments %}
+      <p><strong>{{ comment.name }}</strong>：{{ comment.body }}</p>
+    {% empty %}
+      <p>コメントはまだありません。</p>
+    {% endfor %}
+
+    <h3>コメントを投稿する</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">コメント投稿</button>
+    </form>
+
   </body>
 
 </html>
